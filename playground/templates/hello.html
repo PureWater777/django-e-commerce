@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if name %}
+    <h1>Hello {{ name }} world</h1>
+{% else %}
+    <h1>Hello world</h1>
+{% endif %}
+
+{% for customer in customer %}
+    <ul>{{ customer.first_name }} {{ customer.amount_spent }}</ul>
+{% endfor %}
+
+</body>
+</html>
