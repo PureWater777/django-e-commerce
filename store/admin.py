@@ -1,9 +1,11 @@
 from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models import Count, QuerySet
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 from . import models
 
+# Filters
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
     parameter_name = 'inventory'
@@ -37,12 +39,15 @@ class CostFilter(admin.SimpleListFilter):
         if self.value() == '>=10':
            return queryset.filter(unit_price__gte=10)
 
+
+# Models registration
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
     prepopulated_fields = {
         'slug': ['title']
     }
+    search_fields = ['product']
     exclude = ['promotions']
     actions = ['clear_inventory']
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
@@ -50,6 +55,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['collection', 'last_update', InventoryFilter, CostFilter]
     list_per_page = 20
     list_select_related = ['collection']
+
 
     @admin.display(ordering='inventory')
     def inventory_status(self, product):
@@ -89,10 +95,19 @@ class CollectionAdmin(admin.ModelAdmin):
         return super().get_queryset(request).annotate(
             products_count=Count('product')
         )
+# Inlines child augmentation
+
+class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ['product']
+    model = models.OrderItem
+    extra = 0
+    min_num = 1
+    max_num = 5
 
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
+    inlines = [OrderItemInline]
     list_display = ['id', 'placed_at', 'customer']
     ordering = ['customer']
     list_select_related = ['customer']
