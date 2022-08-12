@@ -1,6 +1,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
+
 # Create your models here.
 
 class Promotion(models.Model):
@@ -17,6 +18,7 @@ class Collection(models.Model):
 
     class Meta:
         ordering = ['title']
+
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -37,11 +39,11 @@ class Product(models.Model):
     class Meta:
         ordering = ['title']
 
+
 class Customer(models.Model):
     BRONZE_MEMBERSHIP = 'B'
     SILVER_MEMBERSHIP = 'S'
     GOLD_MEMBERSHIP = 'G'
-
 
     MEMBERSHIP_CHOICES = [
         (BRONZE_MEMBERSHIP, 'Bronze'),
@@ -59,6 +61,7 @@ class Customer(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+
 class Order(models.Model):
     PENDING = 'P'
     COMPLETE = 'C'
@@ -72,6 +75,7 @@ class Order(models.Model):
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(max_length=1, choices=PAYMENT_OPTIONS, default=PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='orderitems')
@@ -87,8 +91,10 @@ class Address(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     zip = models.CharField(max_length=255, default=DEFAULT_ZIP)
 
+
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
@@ -96,6 +102,8 @@ class CartItem(models.Model):
     quantity = models.PositiveSmallIntegerField()
 
 
-
-
-
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)
